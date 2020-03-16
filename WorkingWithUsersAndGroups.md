@@ -330,3 +330,41 @@ rm: remove directory ‘/home/dbadmin’? y
 [root@node1 /]#
 ```
 
+### Lab - Linux User Management - Working with Secondary Groups ###
+
+```
+[root@node1 ~]# groupadd -g 3000 appadm
+[root@node1 ~]# groupadd -g 4000 dba
+[root@node1 ~]# useradd -g appadm -G dba user1
+[root@node1 ~]# useradd -g appadm -G dba user2
+[root@node1 ~]# useradd -g appadm -G dba user3
+[root@node1 ~]# mkdir /app
+[root@node1 ~]# chgrp appadm /app
+[root@node1 ~]# chmod 760 /app
+[root@node1 ~]# ls -al / |grep app
+drwxrw----.  2 root appadm    6 Mar 16 21:32 app
+[root@node1 ~]# mkdir /db
+[root@node1 ~]# chgrp dba /db
+[root@node1 ~]# chmod 760 /db
+[root@node1 ~]# ls -al /|grep db
+drwxrw----.  2 root dba       6 Mar 16 21:33 db
+[root@node1 ~]# echo "This file is reserved for application configuration." > /app/app1.conf
+[root@node1 ~]# ls -al /app/app1.conf
+-rw-r--r--. 1 root root 53 Mar 16 21:35 /app/app1.conf
+[root@node1 ~]# chgrp appadm /app/app1.conf
+[root@node1 ~]# chmod 760 /app/app1.conf
+[root@node1 ~]# ls -al /app/app1.conf
+-rwxrw----. 1 root appadm 53 Mar 16 21:35 /app/app1.conf
+[root@node1 ~]# echo "This file is reserved for database configuration." > /db/db1.conf
+[root@node1 ~]# ls -al /db/db1.conf
+-rw-r--r--. 1 root root 50 Mar 16 21:37 /db/db1.conf
+[root@node1 ~]# chgrp dba /db/db1.conf
+[root@node1 ~]# chmod 760 /db/db1.conf
+[root@node1 ~]# ls -al /db
+total 4
+drwxrw----.  2 root dba   22 Mar 16 21:37 .
+dr-xr-xr-x. 20 root root 257 Mar 16 21:33 ..
+-rwxrw----.  1 root dba   50 Mar 16 21:37 db1.conf
+[root@node1 ~]#
+```
+
