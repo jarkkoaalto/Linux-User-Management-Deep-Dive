@@ -242,6 +242,91 @@ OPTIONS
 - grpconv, grpunconv - /etc/group and /etc/gshadow
 
 
- 
+Learning Objectives
 
+- Create the appusers group
+- Create the appuser1 user account with a UID of 2001. The gecos field should contain, “Admin1 Account for ABC Application.”
+- Create the appuser2 user account with a UID of 2002. The gecos field should contain, “Admin2 Account for ABC Application."
+ 
+```
+[cloud_user@node1 ~]$ sudo su
+[root@node1 cloud_user]# groupadd appusers
+[root@node1 cloud_user]# useradd -u 2001 -c "Admin1 Account for ABC Application" -g appusers appuser1
+[root@node1 cloud_user]# useradd -u 2002 -c "Admin2 Account for ABC Application" -g appusers appuser2
+[root@node1 cloud_user]# grep appuser /etc/passwd
+appuser1:x:2001:1004:Admin1 Account for ABC Application:/home/appuser1:/bin/bash
+appuser2:x:2002:1004:Admin2 Account for ABC Application:/home/appuser2:/bin/bash
+[root@node1 cloud_user]#
+```
+
+## Lab - Linux User Management - Modify user settings and removing groups ##
+ 
+ ```
+ [root@node1 ~]# grep dbadmin /etc/passwd
+dbadmin:x:1003:1003::/home/dbadmin:/bin/bash
+[root@node1 ~]# usermod -s /sbin/nologin dbadmin
+[root@node1 ~]# grep dbadmin /etc/passwd
+dbadmin:x:1003:1003::/home/dbadmin:/sbin/nologin
+[root@node1 ~]# grep dba /etc/group
+dbadmin:x:1003:
+[root@node1 ~]# groupadd dba
+[root@node1 ~]# grep dba /etc/group
+dbadmin:x:1003:
+dba:x:1004:
+[root@node1 ~]# usermod -g dba dbadmin
+[root@node1 ~]# grep dbadmin /etc/passwd
+dbadmin:x:1003:1004::/home/dbadmin:/sbin/nologin
+[root@node1 ~]# id dbadmin
+uid=1003(dbadmin) gid=1004(dba) groups=1004(dba)
+[root@node1 ~]# ls /
+bin  boot  data  dev  etc  home  lib  lib64  media  mnt  opt  proc  root  run  sbin  srv  sys  tmp  usr  var
+[root@node1 ~]# mkdir /dba
+[root@node1 ~]# ls
+anaconda-ks.cfg  original-ks.cfg
+[root@node1 ~]# ls /
+bin  boot  data  dba  dev  etc  home  lib  lib64  media  mnt  opt  proc  root  run  sbin  srv  sys  tmp  usr  var
+[root@node1 ~]# ls -al /|grep dba
+drwxr-xr-x.  2 root root    6 Mar 16 15:46 dba
+[root@node1 ~]# chmod 740 /dba
+[root@node1 ~]# ls -al /|grep dba
+drwxr-----.  2 dbadmin dba     6 Mar 16 15:46 dba
+[root@node1 home]# cd dbadmin
+[root@node1 dbadmin]# ls -al
+total 12
+drwx------. 2 dbadmin dba   62 Mar 16 15:08 .
+drwxr-xr-x. 6 root    root  75 Mar 16 15:08 ..
+-rw-r--r--. 1 dbadmin dba   18 Mar 12  2019 .bash_logout
+-rw-r--r--. 1 dbadmin dba  193 Mar 12  2019 .bash_profile
+-rw-r--r--. 1 dbadmin dba  231 Mar 12  2019 .bashrc
+[root@node1 dbadmin]# cp .bash* /dba
+[root@node1 dbadmin]# cd /dba
+[root@node1 dba]# ls -la
+total 12
+drwxr-----.  2 dbadmin dba   62 Mar 16 15:52 .
+dr-xr-xr-x. 19 root    root 247 Mar 16 15:46 ..
+-rw-r--r--.  1 root    root  18 Mar 16 15:52 .bash_logout
+-rw-r--r--.  1 root    root 193 Mar 16 15:52 .bash_profile
+-rw-r--r--.  1 root    root 231 Mar 16 15:52 .bashrc
+[root@node1 dba]#
+[root@node1 dba]# chown dbadmin:dba .bash*
+[root@node1 dba]# ls -la
+total 12
+drwxr-----.  2 dbadmin dba   62 Mar 16 15:52 .
+dr-xr-xr-x. 19 root    root 247 Mar 16 15:46 ..
+-rw-r--r--.  1 dbadmin dba   18 Mar 16 15:52 .bash_logout
+-rw-r--r--.  1 dbadmin dba  193 Mar 16 15:52 .bash_profile
+-rw-r--r--.  1 dbadmin dba  231 Mar 16 15:52 .bashrc
+[root@node1 dba]#
+[root@node1 dba]# usermod -d /dba dbadmin
+[root@node1 dba]# grep dbadmin /etc/passwd
+dbadmin:x:1003:1004::/dba:/sbin/nologin
+[root@node1 dba]#
+[root@node1 /]# rm -R /home/dbadmin
+rm: descend into directory ‘/home/dbadmin’? y
+rm: remove regular file ‘/home/dbadmin/.bash_logout’? y
+rm: remove regular file ‘/home/dbadmin/.bash_profile’? y
+rm: remove regular file ‘/home/dbadmin/.bashrc’? y
+rm: remove directory ‘/home/dbadmin’? y
+[root@node1 /]#
+```
 
